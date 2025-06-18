@@ -28,6 +28,7 @@ router.post("/logout", logoutUser)
 router.get("/profile", getUserProfile)
 router.put("/profile", validate(userValidation.updateProfile), updateUserProfile)
 
+
 /**
  * Admin Only Routes
  */

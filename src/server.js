@@ -10,6 +10,7 @@ const { errorHandler, notFound } = require("./middlewares/errorHandler")
 
 // Route imports
 const userRoutes = require("./routes/userRoutes")
+const productRoutes = require("./routes/productRoutes") // 👈 Add this
 
 // Connect to database
 connectDB()
@@ -87,6 +88,7 @@ app.get("/health", (req, res) => {
  * API Routes
  */
 app.use("/api/v1/users", userRoutes)
+app.use("/api/v1/products", productRoutes) // 👈 And mount here
 
 // API documentation route (placeholder)
 app.get("/api/v1", (req, res) => {

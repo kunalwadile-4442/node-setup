@@ -113,7 +113,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Logout successful. Please remove the token from client storage.",
+    message: "Logout successful.",
   })
 })
 

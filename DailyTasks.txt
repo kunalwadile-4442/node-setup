@@ -1,0 +1,7 @@
+Date: 17/06/2025
+Create product schema
+create create product controlloer 
+
+
+Date: 18/06/2025
+priduct crud and admin also acces the product
