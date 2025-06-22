@@ -3,12 +3,22 @@ const Product = require("../models/Product");
 /**
  * Create a new product
  */
-const createProductService = async ({ name, price, description, imageUrl, userId }) => {
+const createProductService = async ({
+  name,
+  price,
+  description,
+  imageUrl,
+  category,
+  subcategory,
+  userId,
+}) => {
   return await Product.create({
     name,
     price,
     description,
     imageUrl,
+    category,
+    subcategory,
     user: userId,
   });
 };
@@ -16,9 +26,10 @@ const createProductService = async ({ name, price, description, imageUrl, userId
 /**
  * Get all products
  */
-const getAllProductsService = async () => {
-  return await Product.find().populate("user", "name email");
+const getAllProductsService = async (filter = {}) => {
+  return await Product.find(filter).populate("user", "name email");
 };
+
 
 /**
  * Get a product by ID

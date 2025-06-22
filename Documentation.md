@@ -200,7 +200,7 @@ Let's trace what happens when a user registers: `POST /api/v1/users/register`
    Data: { name: "John", email: "john@email.com", password: "123456" }
 
 2. 🌐 Express server receives request → server.js
-   - Server is listening on port 5000
+   - Server is listening on port 5001
    - Request hits the Express app
 
 3. 🛡️ Middleware runs (in order):
@@ -310,7 +310,7 @@ app.use(express.json())  // Parses JSON request bodies
 app.use("/api/v1/users", userRoutes)  // All user routes start with /api/v1/users
 
 // START SERVER
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
@@ -322,7 +322,7 @@ What happens when you run `npm start`:
 3. Connects to MongoDB
 4. Sets up middleware
 5. Defines routes
-6. Starts listening for requests on port 5000
+6. Starts listening for requests on port 5001
 
 ### 📊 `models/User.js` - Data Structure
 

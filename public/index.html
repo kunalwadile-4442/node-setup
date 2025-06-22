@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js REST API Tester</title>
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .config-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .config-group {
+            flex: 1;
+        }
+
+        .config-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .expand-collapse {
+            margin-bottom: 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .expand-collapse h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .expand-collapse h3:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .expand-collapse h3::after {
+            content: '▼';
+            position: absolute;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-collapse h3.active::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            padding: 0;
+            background: white;
+        }
+
+        .tab-menu {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .tab-menu ul {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-menu ul li {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .tab-menu ul li a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            text-align: center;
+            border-right: 1px solid #e1e5e9;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .tab-menu ul li:last-child a {
+            border-right: none;
+        }
+
+        .tab-menu ul li a:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-menu ul li a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-box {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-box.active {
+            display: block;
+        }
+
+        .endpoint-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method-get { background: #4caf50; color: white; }
+        .method-post { background: #2196f3; color: white; }
+        .method-put { background: #ff9800; color: white; }
+        .method-delete { background: #f44336; color: white; }
+
+        .json-editor {
+            background: #2d3748;
+            color: #e2e8f0;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .response-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+            display: none;
+        }
+
+        .response-section.show {
+            display: block;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .response-status {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .response-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .response-output {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .server-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .server-info strong {
+            color: #856404;
+        }
+
+        .clear-response {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .clear-response:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .config-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .tab-menu ul {
+                flex-direction: column;
+            }
+            
+            .tab-menu ul li {
+                flex: none;
+            }
+            
+            .tab-menu ul li a {
+                border-right: none;
+                border-bottom: 1px solid #e1e5e9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Node.js REST API Tester</h1>
+            <p>Test your REST API endpoints with ease</p>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <div class="config-group">
+                <label for="serverUrl">🌐 Server URL:</label>
+                <input type="text" id="serverUrl" class="form-control" value="http://localhost:5000" placeholder="http://localhost:5000">
+            </div>
+            <div class="config-group">
+                <label for="authToken">🔐 JWT Token:</label>
+                <input type="text" id="authToken" class="form-control" placeholder="Paste your JWT token here...">
+            </div>
+            <div class="config-group">
+                <button id="saveConfig" class="btn btn-primary">💾 Save Config</button>
+            </div>
+        </div>    
+
+        <!-- Server Status -->
+        <div class="server-info">
+            <div>
+                <strong>📡 Server Status:</strong> <span id="serverStatus">Checking...</span>
+            </div>
+            <button id="checkStatus" class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">🔄 Check</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="apiSections">
+                <!-- API sections will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let currentToken = localStorage.getItem('authToken') || '';
+            let serverUrl = localStorage.getItem('serverUrl') || 'http://localhost:5001';
+            
+            // Load saved values
+            $('#authToken').val(currentToken);
+            $('#serverUrl').val(serverUrl);
+
+            // Payload Templates - Define once, reuse everywhere
+            const payloadTemplates = {
+                user: {
+                    register: {
+                        "name": "Akshu",
+                        "email": "akshu@gmail.com",
+                        "password": "Akshu@123"
+                    },
+                    login: {
+                        "email": "akshu@gmail.com",
+                        "password": "Akshu@123"
+                    },
+                    update: {
+                        "name": "John Updated",
+                        "email": "john.updated@example.com"
+                    }
+                },
+                product: {
+                    create: {
+                        "name": "Sample Product",
+                        "description": "Product description here",
+                        "price": 99.99,
+                        "category": "electronics",
+                        "subcategory": "mobiles",
+                        "imageUrl": "https://example.com/image.jpg"
+                    },
+                    update: {
+                        "name": "Updated Product",
+                        "price": 149.99
+                    }
+                }
+            };
+
+            // Simplified API Configuration - Just define the essentials!
+            const apiEndpoints = [
+                {
+                    section: "👤 User Authentication",
+                    endpoints: [
+                        { name: "Register User", method: "POST", path: "/api/v1/users/register", auth: false, template: "user.register" },
+                        { name: "Login User", method: "POST", path: "/api/v1/users/login", auth: false, template: "user.login" },
+                        { name: "Get Profile", method: "GET", path: "/api/v1/users/profile", auth: true },
+                        { name: "Update Profile", method: "PUT", path: "/api/v1/users/profile", auth: true, template: "user.update" },
+                        { name: "Logout", method: "POST", path: "/api/v1/users/logout", auth: true }
+                    ]
+                },
+                {
+                    section: "📦 Product Management",
+                    endpoints: [
+                        { name: "Get All Products", method: "GET", path: "/api/v1/products", auth: false, query: "?page=1&limit=10&category=electronics" },
+                        { name: "Create Product", method: "POST", path: "/api/v1/products", auth: true, template: "product.create" },
+                        { name: "Get Single Product", method: "GET", path: "/api/v1/products/{id}", auth: false, note: "Replace {id} with product ID" },
+                         { name: "Get Product category and subcatrgory", method: "GET", path: "/api/v1/products?category={categoryName}&subcategory={subcategoryName}", auth: false, note: "Replace categoryName and subcategoryName with actual category and subcategory names" },
+                        { name: "Update Product", method: "PUT", path: "/api/v1/products/{id}", auth: true, template: "product.update", note: "Replace {id} with product ID" },
+                        { name: "Delete Product", method: "DELETE", path: "/api/v1/products/{id}", auth: true, note: "Replace {id} with product ID" }
+                    ]
+                },
+                {
+                    section: "👥 Admin Operations",
+                    endpoints: [
+                        { name: "Get All Users", method: "GET", path: "/api/v1/users", auth: true, query: "?page=1&limit=10" },
+                        { name: "Delete User", method: "DELETE", path: "/api/v1/users/{id}", auth: true, note: "Replace {id} with user ID" }
+                    ]
+                },
+                {
+                    section: "🔧 System",
+                    endpoints: [
+                        { name: "Health Check", method: "GET", path: "/health", auth: false },
+                        { name: "API Info", method: "GET", path: "/api/v1", auth: false }
+                    ]
+                }
+            ];
+
+            // Helper function to get payload from template
+            function getPayloadFromTemplate(templatePath) {
+                if (!templatePath) return null;
+                
+                const parts = templatePath.split('.');
+                let payload = payloadTemplates;
+                
+                for (const part of parts) {
+                    payload = payload[part];
+                    if (!payload) return null;
+                }
+                
+                return JSON.parse(JSON.stringify(payload)); // Deep clone
+            }
+
+            // Auto-generate descriptions
+            function generateDescription(method, name, auth) {
+                const authText = auth ? " (Requires Authentication)" : " (Public)";
+                const methodDescriptions = {
+                    GET: "Retrieve",
+                    POST: "Create",
+                    PUT: "Update", 
+                    DELETE: "Delete"
+                };
+                
+                return `${methodDescriptions[method] || "Process"} ${name.toLowerCase()}${authText}`;
+            }
+
+            // Convert simplified config to full config
+            function buildApiConfig() {
+                return apiEndpoints.map(section => ({
+                    title: section.section,
+                    endpoints: section.endpoints.map(endpoint => ({
+                        name: endpoint.name,
+                        method: endpoint.method,
+                        url: endpoint.path,
+                        requiresAuth: endpoint.auth,
+                        description: generateDescription(endpoint.method, endpoint.name, endpoint.auth),
+                        payload: getPayloadFromTemplate(endpoint.template),
+                        queryParams: endpoint.query,
+                        urlParams: endpoint.note
+                    }))
+                }));
+            }
+
+            // Replace the old apiConfig with the auto-generated one
+            const apiConfig = buildApiConfig();
+
+            // Generate API sections
+            function generateApiSections() {
+                const container = $('#apiSections');
+                container.empty();
+
+                apiConfig.forEach((section, sectionIndex) => {
+                    let sectionHtml = `
+                        <div class="expand-collapse">
+                            <h3 class="accordion-header" data-section="${sectionIndex}">
+                                ${section.title}
+                            </h3>
+                            <div class="accordion-body" style="display: none;">
+                                <div class="tab-menu">
+                                    <ul>
+                    `;
+
+                    // Generate tabs
+                    section.endpoints.forEach((endpoint, endpointIndex) => {
+                        const isActive = endpointIndex === 0 ? 'active' : '';
+                        sectionHtml += `
+                            <li>
+                                <a href="#" class="${isActive}" data-tab="tab-${sectionIndex}-${endpointIndex}">
+                                    ${endpoint.name}
+                                </a>
+                            </li>
+                        `;
+                    });
+
+                    sectionHtml += `
+                                    </ul>
+                                </div>
+                                <div class="tab-content">
+                    `;
+
+                    // Generate tab content
+                    section.endpoints.forEach((endpoint, endpointIndex) => {
+                        const isActive = endpointIndex === 0 ? 'active' : '';
+                        const methodClass = `method-${endpoint.method.toLowerCase()}`;
+                        
+                        sectionHtml += `
+                            <div class="tab-box ${isActive}" id="tab-${sectionIndex}-${endpointIndex}">
+                                <div class="endpoint-info">
+                                    <span class="method-badge ${methodClass}">${endpoint.method}</span>
+                                    <strong>${endpoint.url}</strong>
+                                    ${endpoint.queryParams ? `<br><small>Query: ${endpoint.queryParams}</small>` : ''}
+                                    ${endpoint.urlParams ? `<br><small>Note: ${endpoint.urlParams}</small>` : ''}
+                                    <br><em>${endpoint.description}</em>
+                                    ${endpoint.requiresAuth ? '<br><span style="color: #dc3545;">🔒 Requires Authentication</span>' : '<span style="color: #28a745;">🌐 Public Endpoint</span>'}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Request URL:</label>
+                                    <input type="text" class="form-control endpoint-url" value="${endpoint.url}" data-original="${endpoint.url}">
+                                </div>
+                                
+                                ${endpoint.payload ? `
+                                <div class="form-group">
+                                    <label>Request Body (JSON):</label>
+                                    <textarea class="json-editor request-payload">${JSON.stringify(endpoint.payload, null, 2)}</textarea>
+                                </div>
+                                ` : ''}
+                                
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <button class="btn btn-success send-request" 
+                                            data-method="${endpoint.method}" 
+                                            data-auth="${endpoint.requiresAuth}"
+                                            data-section="${sectionIndex}"
+                                            data-endpoint="${endpointIndex}">
+                                        🚀 Send Request
+                                    </button>
+                                    
+                                </div>
+                                
+                                <!-- Response Section for this specific endpoint -->
+                                <div class="response-section" id="response-${sectionIndex}-${endpointIndex}">
+                                    <div class="response-header">
+                                        <div>
+                                            <span class="response-status"></span>
+                                            <span class="response-time"></span>
+                                        </div>
+                                        <button class="clear-response" onclick="clearResponse(${sectionIndex}, ${endpointIndex})">✕ Clear</button>
+                                    </div>
+                                    <div class="response-output"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    sectionHtml += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    container.append(sectionHtml);
+                });
+            }
+
+            // Initialize
+            generateApiSections();
+            checkServerStatus();
+
+            // Event handlers
+            $('#saveConfig').click(function() {
+                currentToken = $('#authToken').val().trim();
+                serverUrl = $('#serverUrl').val().trim();
+                
+                localStorage.setItem('authToken', currentToken);
+                localStorage.setItem('serverUrl', serverUrl);
+                
+                showNotification('✅ Configuration saved successfully!', 'success');
+                checkServerStatus();
+            });
+
+            $('#checkStatus').click(function() {
+                checkServerStatus();
+            });
+
+            // Accordion functionality
+            $(document).on('click', '.accordion-header', function() {
+                const $this = $(this);
+                const $body = $this.next('.accordion-body');
+                const isActive = $this.hasClass('active');
+
+                // Close all other accordions
+                $('.accordion-header').removeClass('active');
+                $('.accordion-body').slideUp();
+
+                if (!isActive) {
+                    $this.addClass('active');
+                    $body.slideDown();
+                }
+            });
+
+            // Tab functionality
+            $(document).on('click', '.tab-menu a', function(e) {
+                e.preventDefault();
+                const $this = $(this);
+                const tabId = $this.data('tab');
+                
+                // Update active tab
+                $this.closest('.tab-menu').find('a').removeClass('active');
+                $this.addClass('active');
+                
+                // Show corresponding content
+                $this.closest('.accordion-body').find('.tab-box').removeClass('active');
+                $(`#${tabId}`).addClass('active');
+            });
+
+            // Send request functionality
+            $(document).on('click', '.send-request', function() {
+                const $btn = $(this);
+                const $tabBox = $btn.closest('.tab-box');
+                const method = $btn.data('method');
+                const requiresAuth = $btn.data('auth');
+                const sectionIndex = $btn.data('section');
+                const endpointIndex = $btn.data('endpoint');
+                const url = $tabBox.find('.endpoint-url').val();
+                const payloadText = $tabBox.find('.request-payload').val();
+
+                // Get response section for this specific endpoint
+                const $responseSection = $(`#response-${sectionIndex}-${endpointIndex}`);
+
+                // Validate inputs
+                if (!serverUrl) {
+                    updateResponseOutput($responseSection, '❌ Please set server URL first!', 'error', 0);
+                    return;
+                }
+
+                if (requiresAuth && !currentToken) {
+                    updateResponseOutput($responseSection, '❌ This endpoint requires authentication. Please set JWT token first!', 'error', 0);
+                    return;
+                }
+
+                // Prepare request
+                let payload = null;
+                if (payloadText) {
+                    try {
+                        payload = JSON.parse(payloadText);
+                    } catch (e) {
+                        updateResponseOutput($responseSection, '❌ Invalid JSON in request body!', 'error', 0);
+                        return;
+                    }
+                }
+
+                // Show loading state
+                $btn.addClass('loading').text('⏳ Sending...');
+                updateResponseOutput($responseSection, '⏳ Sending request...', 'info', 0);
+
+                const startTime = Date.now();
+
+                // Make request
+                makeApiRequest(method, serverUrl + url, payload, requiresAuth)
+                    .then(response => {
+                        const endTime = Date.now();
+                        const responseTime = endTime - startTime;
+                        
+                        $btn.removeClass('loading').text('🚀 Send Request');
+                        updateResponseOutput($responseSection, JSON.stringify(response, null, 2), 'success', responseTime);
+                        
+                        // Auto-extract token from login response
+                        if (sectionIndex === 0 && endpointIndex === 1) { // Login endpoint
+                            try {
+                                if (response.data && response.data.token) {
+                                    $('#authToken').val(response.data.token);
+                                    currentToken = response.data.token;
+                                    localStorage.setItem('authToken', currentToken);
+                                    showNotification('🔑 JWT Token automatically saved!', 'success');
+                                }
+                            } catch (e) {
+                                // Ignore parsing errors
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        const endTime = Date.now();
+                        const responseTime = endTime - startTime;
+                        
+                        $btn.removeClass('loading').text('🚀 Send Request');
+                        updateResponseOutput($responseSection, JSON.stringify(error, null, 2), 'error', responseTime);
+                    });
+            });
+
+            // API request function
+            function makeApiRequest(method, url, payload, requiresAuth) {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+
+                if (requiresAuth && currentToken) {
+                    headers['Authorization'] = `Bearer ${currentToken}`;
+                }
+
+                const options = {
+                    method: method,
+                    headers: headers
+                };
+
+                if (payload && (method === 'POST' || method === 'PUT')) {
+                    options.body = JSON.stringify(payload);
+                }
+
+                return fetch(url, options)
+                    .then(async response => {
+                        const data = await response.json();
+                        return {
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: data
+                        };
+                    })
+                    .catch(error => {
+                        throw {
+                            error: 'Network Error',
+                            message: error.message,
+                            type: 'FETCH_ERROR'
+                        };
+                    });
+            }
+
+            // Update response output for specific endpoint
+            function updateResponseOutput($responseSection, content, type, responseTime) {
+                const $status = $responseSection.find('.response-status');
+                const $time = $responseSection.find('.response-time');
+                const $output = $responseSection.find('.response-output');
+                
+                $output.text(content);
+                $responseSection.addClass('show');
+                
+                if (type === 'success') {
+                    $status.html('<span class="status-success">✅ Success</span>');
+                } else if (type === 'error') {
+                    $status.html('<span class="status-error">❌ Error</span>');
+                } else {
+                    $status.html('<span class="status-info">ℹ️ Info</span>');
+                }
+                
+                if (responseTime > 0) {
+                    $time.text(`⏱️ ${responseTime}ms`);
+                } else {
+                    $time.text('');
+                }
+            }
+
+            // Check server status
+            function checkServerStatus() {
+                if (!serverUrl) {
+                    $('#serverStatus').html('<span style="color: #dc3545;">❌ No server URL set</span>');
+                    return;
+                }
+
+                $('#serverStatus').html('<span style="color: #6c757d;">⏳ Checking...</span>');
+
+                fetch(serverUrl + '/health')
+                    .then(response => response.json())
+                    .then(data => {
+                        $('#serverStatus').html('<span style="color: #28a745;">✅ Server is running</span>');
+                    })
+                    .catch(error => {
+                        $('#serverStatus').html('<span style="color: #dc3545;">❌ Server not reachable</span>');
+                    });
+            }
+
+            // Show notification
+            function showNotification(message, type) {
+                // You can implement a toast notification here
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
+
+            // Quick payload editor
+            function showPayloadEditor(sectionIndex, endpointIndex) {
+                const endpoint = apiConfig[sectionIndex].endpoints[endpointIndex];
+                if (!endpoint.payload) return;
+                
+                const newPayload = prompt(
+                    `Edit payload for ${endpoint.name}:\n\n` + 
+                    JSON.stringify(endpoint.payload, null, 2),
+                    JSON.stringify(endpoint.payload, null, 2)
+                );
+                
+                if (newPayload) {
+                    try {
+                        const parsed = JSON.parse(newPayload);
+                        endpoint.payload = parsed;
+                        
+                        // Update the textarea
+                        $(`#tab-${sectionIndex}-${endpointIndex} .request-payload`).val(JSON.stringify(parsed, null, 2));
+                        
+                        showNotification('✅ Payload updated!', 'success');
+                    } catch (e) {
+                        alert('❌ Invalid JSON format!');
+                    }
+                }
+            }
+
+            // Random data generator
+            function generateRandomData(type) {
+                const generators = {
+                    name: () => ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson'][Math.floor(Math.random() * 4)],
+                    email: () => `user${Math.floor(Math.random() * 1000)}@example.com`,
+                    password: () => 'Password' + Math.floor(Math.random() * 1000),
+                    price: () => Math.floor(Math.random() * 1000) + 10,
+                    product: () => ['iPhone', 'Samsung Galaxy', 'MacBook', 'iPad'][Math.floor(Math.random() * 4)]
+                };
+                
+                return generators[type] ? generators[type]() : 'sample-value';
+            }
+
+            // Bulk payload update
+            function updateAllPayloads() {
+                apiConfig.forEach((section, sectionIndex) => {
+                    section.endpoints.forEach((endpoint, endpointIndex) => {
+                        if (endpoint.payload) {
+                            // Add random data to make testing more realistic
+                            const payload = { ...endpoint.payload };
+                            
+                            if (payload.name) payload.name = generateRandomData('name');
+                            if (payload.email) payload.email = generateRandomData('email');
+                            if (payload.password) payload.password = generateRandomData('password');
+                            if (payload.price) payload.price = generateRandomData('price');
+                            
+                            // Update the textarea if it exists
+                            const $textarea = $(`#tab-${sectionIndex}-${endpointIndex} .request-payload`);
+                            if ($textarea.length) {
+                                $textarea.val(JSON.stringify(payload, null, 2));
+                            }
+                        }
+                    });
+                });
+                
+                showNotification('🎲 All payloads randomized!', 'success');
+            }
+
+            // Export configuration
+            function exportConfig() {
+                const config = {
+                    serverUrl: serverUrl,
+                    payloadTemplates: payloadTemplates,
+                    apiEndpoints: apiEndpoints
+                };
+                
+                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'api-tester-config.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showNotification('📤 Configuration exported!', 'success');
+            }
+
+            // Import configuration
+            function importConfig() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const config = JSON.parse(e.target.result);
+                            
+                            if (config.serverUrl) {
+                                $('#serverUrl').val(config.serverUrl);
+                                serverUrl = config.serverUrl;
+                            }
+                            
+                            if (config.payloadTemplates) {
+                                Object.assign(payloadTemplates, config.payloadTemplates);
+                            }
+                            
+                            if (config.apiEndpoints) {
+                                apiEndpoints.length = 0;
+                                apiEndpoints.push(...config.apiEndpoints);
+                                
+                                // Regenerate the interface
+                                const newApiConfig = buildApiConfig();
+                                apiConfig.length = 0;
+                                apiConfig.push(...newApiConfig);
+                                generateApiSections();
+                            }
+                            
+                            showNotification('📥 Configuration imported successfully!', 'success');
+                        } catch (error) {
+                            alert('❌ Invalid configuration file!');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            // Randomize single payload
+            function randomizePayload(sectionIndex, endpointIndex) {
+                const endpoint = apiConfig[sectionIndex].endpoints[endpointIndex];
+                if (!endpoint.payload) return;
+                
+                const payload = { ...endpoint.payload };
+                
+                if (payload.name) payload.name = generateRandomData('name');
+                if (payload.email) payload.email = generateRandomData('email');
+                if (payload.password) payload.password = generateRandomData('password');
+                if (payload.price) payload.price = generateRandomData('price');
+                
+                $(`#tab-${sectionIndex}-${endpointIndex} .request-payload`).val(JSON.stringify(payload, null, 2));
+                showNotification('🎲 Payload randomized!', 'success');
+            }
+
+            // Reset payload to original template
+            function resetPayload(sectionIndex, endpointIndex) {
+                const endpoint = apiConfig[sectionIndex].endpoints[endpointIndex];
+                if (!endpoint.payload) return;
+                
+                $(`#tab-${sectionIndex}-${endpointIndex} .request-payload`).val(JSON.stringify(endpoint.payload, null, 2));
+                showNotification('🔄 Payload reset to template!', 'success');
+            }
+        });
+
+        // Global function to clear response
+        function clearResponse(sectionIndex, endpointIndex) {
+            const $responseSection = $(`#response-${sectionIndex}-${endpointIndex}`);
+            $responseSection.removeClass('show');
+            $responseSection.find('.response-output').text('');
+            $responseSection.find('.response-status').text('');
+            $responseSection.find('.response-time').text('');
+        }
+    </script>
+</body>
+</html>

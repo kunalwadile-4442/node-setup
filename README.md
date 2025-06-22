@@ -59,7 +59,7 @@ src/
    Update the `.env` file with your configuration:
    \`\`\`env
    NODE_ENV=development
-   PORT=5000
+   PORT=5001
    MONGODB_URI=mongodb://localhost:27017/nodejs-rest-api
    JWT_SECRET=your-super-secret-jwt-key-here
    JWT_EXPIRE=7d

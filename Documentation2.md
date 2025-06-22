@@ -724,13 +724,13 @@ Now you can test these endpoints:
 
 \`\`\`bash
 # Get all products
-GET http://localhost:5000/api/v1/products
+GET http://localhost:5001/api/v1/products
 
 # Get products with filters
-GET http://localhost:5000/api/v1/products?category=electronics&search=phone
+GET http://localhost:5001/api/v1/products?category=electronics&search=phone
 
 # Create a product (requires authentication)
-POST http://localhost:5000/api/v1/products
+POST http://localhost:5001/api/v1/products
 Authorization: Bearer YOUR_JWT_TOKEN
 {
   "name": "iPhone 15",
@@ -740,17 +740,17 @@ Authorization: Bearer YOUR_JWT_TOKEN
 }
 
 # Get single product
-GET http://localhost:5000/api/v1/products/PRODUCT_ID
+GET http://localhost:5001/api/v1/products/PRODUCT_ID
 
 # Update product (requires authentication)
-PUT http://localhost:5000/api/v1/products/PRODUCT_ID
+PUT http://localhost:5001/api/v1/products/PRODUCT_ID
 Authorization: Bearer YOUR_JWT_TOKEN
 {
   "price": 899
 }
 
 # Delete product (requires authentication)
-DELETE http://localhost:5000/api/v1/products/PRODUCT_ID
+DELETE http://localhost:5001/api/v1/products/PRODUCT_ID
 Authorization: Bearer YOUR_JWT_TOKEN
 \`\`\`
 
@@ -890,7 +890,7 @@ The `.env` file is like a settings file for your app. It contains sensitive info
 \`\`\`env
 # .env file
 NODE_ENV=development
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://localhost:27017/myapp
 JWT_SECRET=my-super-secret-key
 JWT_EXPIRE=7d
@@ -969,7 +969,7 @@ app.use('/api/v1/products', productRoutes)
 app.use(errorHandler)
 
 // 8. Start server
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
@@ -991,9 +991,9 @@ app.listen(PORT, () => {
 ### What you see in console:
 \`\`\`
 MongoDB Connected: localhost:27017
-🚀 Server running in development mode on port 5000
-📱 Health check: http://localhost:5000/health
-📚 API v1: http://localhost:5000/api/v1
+🚀 Server running in development mode on port 5001
+📱 Health check: http://localhost:5001/health
+📚 API v1: http://localhost:5001/api/v1
 \`\`\`
 
 ---

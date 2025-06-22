@@ -18,6 +18,17 @@ const ProductSchema = new mongoose.Schema(
         type:String,
         required:[true, "PLease upload a image"],
     },
+    category:{
+      type:String,
+      required:[true, "PLease enter category"],
+    },
+    subcategory:{
+      type:String,
+      required: [true, "Please enter sub category"],
+    },
+    quantity:{
+      type:Number,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -25,6 +36,8 @@ const ProductSchema = new mongoose.Schema(
     },
   },
   { timestamps: true }
+  
+
 );
 
 module.exports = mongoose.model("Product", ProductSchema);

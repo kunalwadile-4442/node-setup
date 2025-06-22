@@ -1,22 +1,39 @@
 const { asyncHandler } = require("../middlewares/errorHandler");
 const Product = require("../models/Product");
+const {
+  getAllProductsService,
+} = require("../services/productService");
 
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, imageUrl } = req.body;
+  const {
+    name,
+    price,
+    description,
+    imageUrl,
+    category,
+    subcategory,
+  } = req.body;
 
-  if (!name || !price || !imageUrl) {
-    return (
-      res.status(400),
-      json({
-        message: "Please above fields are required",
-      })
-    );
+  if (
+    !name ||
+    !price ||
+    !imageUrl ||
+    !description ||
+    !category ||
+    !subcategory
+  ) {
+    return res.status(400).json({
+  success: false,
+  message: "All fields are required: name, price, imageUrl, category, subcategory",
+});
   }
   const product = await Product.create({
     name,
     price,
     imageUrl,
     description,
+    category,
+    subcategory,
     user: req.user._id,
   });
   res.status(201).json({
@@ -32,7 +49,12 @@ const createProduct = asyncHandler(async (req, res) => {
  * @access Public
  */
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find().populate("user", "name email");
+  const { category, subcategory } = req.query;
+  const filter = {};
+  if (category) filter.category = category;
+  if (subcategory) filter.subcategory = subcategory;
+
+  const products = await getAllProductsService(filter);
 
   res.status(200).json({
     success: true,
@@ -49,7 +71,9 @@ const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) {
-    return res.status(404).json({ success: false, message: "Product not found" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Product not found" });
   }
 
   res.status(200).json({ success: true, data: product });
@@ -64,14 +88,27 @@ const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) {
-    return res.status(404).json({ success: false, message: "Product not found" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Product not found" });
   }
 
-  if (product.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  if (
+    product.user.toString() !== req.user._id.toString() &&
+    req.user.role !== "admin"
+  ) {
     return res.status(403).json({ success: false, message: "Not authorized" });
   }
 
-  const fieldsToUpdate = ["name", "price", "description", "imageUrl"];
+  const fieldsToUpdate = [
+    "name",
+    "price",
+    "description",
+    "imageUrl",
+    "category",
+    "subcategory",
+    "quantity",
+  ];
   fieldsToUpdate.forEach((field) => {
     if (req.body[field]) product[field] = req.body[field];
   });
@@ -85,7 +122,6 @@ const updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 /**
  * Delete product (only by owner or admin)
  * @route DELETE /api/v1/products/:id
@@ -95,10 +131,15 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (!product) {
-    return res.status(404).json({ success: false, message: "Product not found" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Product not found" });
   }
 
-  if (product.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  if (
+    product.user.toString() !== req.user._id.toString() &&
+    req.user.role !== "admin"
+  ) {
     return res.status(403).json({ success: false, message: "Not authorized" });
   }
 
@@ -110,11 +151,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 module.exports = {
   createProduct,
   getAllProducts,
   getProductById,
   updateProduct,
   deleteProduct,
-}
+};
