@@ -8,6 +8,7 @@ const {
 } = require("../controllers/productController");
 
 const { protect } = require("../middlewares/auth");
+const upload = require("../middlewares/upload");
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get("/", getAllProducts);           // GET all products
 router.get("/:id", getProductById);        // GET single product by ID
 
 // Protected Routes (authenticated users only)
-router.post("/", protect, createProduct);  // Create a product
+router.post("/", protect, upload.single("image"), createProduct); // 👈 file field = "image"
 router.put("/:id", protect, updateProduct); // Update product
 router.delete("/:id", protect, deleteProduct); // Delete product
 

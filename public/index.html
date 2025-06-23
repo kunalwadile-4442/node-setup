@@ -450,6 +450,12 @@
                         "email": "john.updated@example.com"
                     }
                 },
+                category: {
+                    create: {
+                        "name": "electronics",
+                        "subcategories": ["mobiles", "laptops", "headphones"]
+                    }
+                    },
                 product: {
                     create: {
                         "name": "Sample Product",
@@ -477,6 +483,24 @@
                         { name: "Update Profile", method: "PUT", path: "/api/v1/users/profile", auth: true, template: "user.update" },
                         { name: "Logout", method: "POST", path: "/api/v1/users/logout", auth: true }
                     ]
+                },
+                {
+                section: "📁 Category Management",
+                endpoints: [
+                    {
+                    name: "Create Category",
+                    method: "POST",
+                    path: "/api/v1/categories",
+                    auth: true,
+                    template: "category.create"
+                    },
+                    {
+                    name: "Get All Categories",
+                    method: "GET",
+                    path: "/api/v1/categories",
+                    auth: false
+                    }
+                ]
                 },
                 {
                     section: "📦 Product Management",

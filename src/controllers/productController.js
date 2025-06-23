@@ -11,7 +11,6 @@ const createProduct = asyncHandler(async (req, res) => {
     name,
     price,
     description,
-    imageUrl,
     category,
     subcategory,
   } = req.body;
@@ -20,15 +19,13 @@ const createProduct = asyncHandler(async (req, res) => {
   if (
     !name ||
     !price ||
-    !imageUrl ||
     !description ||
     !category ||
     !subcategory
   ) {
     return res.status(400).json({
       success: false,
-      message: "All fields are required: name, price, imageUrl, description, category, subcategory",
-    });
+        message: "All fields are required: name, price, description, category, subcategory, and image file"    });
   }
 
   // ✅ Validate category and subcategory from DB
@@ -39,6 +36,14 @@ const createProduct = asyncHandler(async (req, res) => {
   if (!foundCategory.subcategories.includes(subcategory)) {
     return res.status(400).json({ message: "Invalid subcategory for this category" });
   }
+
+  // Image file is uploaded via multer
+  const imageUrl = req.file?.path;
+
+  if (!imageUrl) {
+    return res.status(400).json({ message: "Image upload failed" });
+  }
+
 
   // ✅ Create product if validation passes
   const product = await Product.create({
