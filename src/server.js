@@ -157,6 +157,8 @@ const { errorHandler, notFound } = require("./middlewares/errorHandler")
 const userRoutes = require("./routes/userRoutes")
 const productRoutes = require("./routes/productRoutes")
 const apiTesterRoute = require("./routes/apiTesterRoutes")
+const categoryRoutes = require("./routes/categoryRoutes");
+
 
 // Connect to database
 connectDB()
@@ -277,6 +279,7 @@ app.use("/api-tester", apiTesterRoute)
  */
 app.use("/api/v1/users", userRoutes)
 app.use("/api/v1/products", productRoutes)
+app.use("/api/v1/categories", categoryRoutes);
 
 // API documentation route (placeholder)
 app.get("/api/v1", (req, res) => {

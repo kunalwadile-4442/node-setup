@@ -4,6 +4,8 @@ const {
   getAllProductsService,
 } = require("../services/productService");
 
+const Category = require("../models/Category");
+
 const createProduct = asyncHandler(async (req, res) => {
   const {
     name,
@@ -14,6 +16,7 @@ const createProduct = asyncHandler(async (req, res) => {
     subcategory,
   } = req.body;
 
+  // Validate required fields
   if (
     !name ||
     !price ||
@@ -23,10 +26,21 @@ const createProduct = asyncHandler(async (req, res) => {
     !subcategory
   ) {
     return res.status(400).json({
-  success: false,
-  message: "All fields are required: name, price, imageUrl, category, subcategory",
-});
+      success: false,
+      message: "All fields are required: name, price, imageUrl, description, category, subcategory",
+    });
   }
+
+  // ✅ Validate category and subcategory from DB
+  const foundCategory = await Category.findOne({ name: category });
+  if (!foundCategory) {
+    return res.status(400).json({ message: "Category not found" });
+  }
+  if (!foundCategory.subcategories.includes(subcategory)) {
+    return res.status(400).json({ message: "Invalid subcategory for this category" });
+  }
+
+  // ✅ Create product if validation passes
   const product = await Product.create({
     name,
     price,
@@ -36,6 +50,7 @@ const createProduct = asyncHandler(async (req, res) => {
     subcategory,
     user: req.user._id,
   });
+
   res.status(201).json({
     success: true,
     message: "Product created successfully",
